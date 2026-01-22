@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyper-Clock | AI Personal Assistant</title>
+    <link rel="manifest" herf="manifest.json">
+    <meta name="theme-color" content="#00ffcc">
     <style>
         :root {
             --bg: #050505;
@@ -223,6 +225,10 @@
         setInterval(rotateQuotes, 10000); // Change quote every 10 seconds
         updateClock();
         rotateQuotes();
+
+        if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
     </script>
 </body>
 </html>
