@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hyper-Clock | AI Personal Assistant</title>
-    <link rel="manifest" herf="manifest.json">
+    <title>Hyper-Clock AI | Offline Pro</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00ffcc">
     <style>
-        :root {
-            --bg: #050505;
-            --neon: #00ffcc;
-        }
-
+        :root { --bg: #050505; --neon: #00ffcc; }
         body {
             background: var(--bg);
             display: flex;
@@ -20,42 +16,15 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
             font-family: 'Segoe UI', sans-serif;
             color: white;
+            overflow: hidden;
         }
 
-        /* Greeting Section */
-        #greeting {
-            font-size: 22px;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-            font-weight: 300;
-            text-transform: uppercase;
-        }
+        #greeting { font-size: 20px; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.8; }
+        #user-name { color: var(--neon); font-weight: bold; cursor: pointer; }
 
-        #user-name {
-            font-weight: bold;
-            color: var(--neon);
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* Motivation Quote Section */
-        #quote-box {
-            height: 40px;
-            margin-bottom: 20px;
-            font-style: italic;
-            font-size: 14px;
-            color: #aaa;
-            text-align: center;
-            max-width: 80%;
-            transition: opacity 0.5s;
-        }
-
-        /* Clock Card */
         .clock-container {
-            position: relative;
             background: rgba(255, 255, 255, 0.02);
             padding: 40px 60px;
             border-radius: 40px;
@@ -66,148 +35,103 @@
         }
 
         #time {
-            font-size: 100px;
+            font-size: 90px;
             font-weight: 900;
             color: var(--neon);
             text-shadow: 0 0 25px var(--neon);
             margin: 0;
-            letter-spacing: 5px;
             font-family: 'monospace';
         }
 
-        #date {
-            font-size: 20px;
-            opacity: 0.5;
-            margin-top: 10px;
-            letter-spacing: 3px;
-        }
+        #ampm { font-size: 30px; margin-left: 10px; vertical-align: middle; }
+        #date { font-size: 18px; opacity: 0.5; margin-top: 10px; }
 
-        /* Controls Panel */
         .controls {
             position: absolute;
             bottom: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 12px;
+            gap: 15px;
             background: rgba(255,255,255,0.05);
-            padding: 15px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 20px;
         }
 
-        .row { display: flex; gap: 12px; align-items: center; }
-        .dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 1px solid #fff; }
+        .row { display: flex; gap: 10px; justify-content: center; }
         .btn {
             background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 11px;
-            text-transform: uppercase;
+            font-size: 12px;
         }
-        .btn.active { background: var(--neon); color: #000; font-weight: bold; }
-
-        @media (max-width: 600px) {
-            #time { font-size: 50px; }
-            #greeting { font-size: 16px; }
-            .clock-container { padding: 30px; }
-        }
+        .btn.active { background: var(--neon); color: black; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="greeting">
-        <span id="wish">HELLO</span>, <span id="user-name" onclick="changeName()">USER</span>
-    </div>
-
-    <div id="quote-box">"Believe you can and you're halfway there."</div>
+    <div id="greeting"><span id="wish">HELLO</span>, <span id="user-name" onclick="setName()">USER</span></div>
 
     <div class="clock-container">
-        <h1 id="time">00:00:00</h1>
+        <h1 id="time">00:00:00<span id="ampm"></span></h1>
         <div id="date">LOADING...</div>
     </div>
 
     <div class="controls">
         <div class="row">
-            <div class="dot" style="background: #00ffcc;" onclick="changeColor('#00ffcc')"></div>
-            <div class="dot" style="background: #ff3366;" onclick="changeColor('#ff3366')"></div>
-            <div class="dot" style="background: #ffcc00;" onclick="changeColor('#ffcc00')"></div>
-            <div class="dot" style="background: #cc66ff;" onclick="changeColor('#cc66ff')"></div>
-            <button class="btn" onclick="toggleFS()">⛶ FULLSCREEN</button>
+            <button id="mode-12" class="btn active" onclick="setMode(12)">Indian (12H)</button>
+            <button id="mode-24" class="btn" onclick="setMode(24)">International (24H)</button>
         </div>
         <div class="row">
-            <button id="tick-btn" class="btn" onclick="toggleSound('tick')">⏱ TICK</button>
-            <button id="rain-btn" class="btn" onclick="toggleSound('rain')">🌧 RAIN</button>
+            <button class="btn" onclick="toggleSound('rain')">🌧 Rain</button>
+            <button class="btn" onclick="toggleFS()">⛶ Fullscreen</button>
         </div>
     </div>
 
-    <audio id="tick-audio" loop src="https://www.soundjay.com/buttons/beep-29.mp3"></audio>
     <audio id="rain-audio" loop src="https://www.soundjay.com/nature/rain-01.mp3"></audio>
 
     <script>
-        const quotes = [
-            "Keep going. Everything you need will come to you at the perfect time.",
-            "Don't stop until you're proud.",
-            "Your limitation—it's only your imagination.",
-            "Push yourself, because no one else is going to do it for you.",
-            "Great things never come from comfort zones.",
-            "Dream it. Wish it. Do it.",
-            "Success doesn't just find you. You have to go out and get it.",
-            "The harder you work for something, the greater you'll feel when you achieve it."
-        ];
+        let is24Hour = false;
 
         function updateClock() {
-            const timeElement = document.getElementById('time');
-            const dateElement = document.getElementById('date');
-            const wishElement = document.getElementById('wish');
             const now = new Date();
-
             let h = now.getHours();
             let m = String(now.getMinutes()).padStart(2, '0');
             let s = String(now.getSeconds()).padStart(2, '0');
-            timeElement.textContent = `${String(h).padStart(2, '0')}:${m}:${s}`;
+            let ampmStr = "";
 
-            const options = { weekday: 'long', day: '2-digit', month: 'short' };
-            dateElement.textContent = now.toLocaleDateString('en-US', options);
-
-            if (h < 12) wishElement.textContent = "GOOD MORNING";
-            else if (h < 17) wishElement.textContent = "GOOD AFTERNOON";
-            else if (h < 21) wishElement.textContent = "GOOD EVENING";
-            else wishElement.textContent = "GOOD NIGHT";
-        }
-
-        function rotateQuotes() {
-            const quoteBox = document.getElementById('quote-box');
-            quoteBox.style.opacity = 0;
-            setTimeout(() => {
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                quoteBox.textContent = `"${randomQuote}"`;
-                quoteBox.style.opacity = 1;
-            }, 500);
-        }
-
-        function changeName() {
-            let newName = prompt("What is your name?");
-            if (newName) {
-                document.getElementById('user-name').textContent = newName.toUpperCase();
-                localStorage.setItem('clockUser', newName);
+            if (!is24Hour) {
+                ampmStr = h >= 12 ? "PM" : "AM";
+                h = h % 12 || 12;
             }
+            
+            document.getElementById('time').innerHTML = `${String(h).padStart(2, '0')}:${m}:${s}<span id="ampm">${ampmStr}</span>`;
+            
+            const options = { weekday: 'long', day: '2-digit', month: 'short' };
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+
+            // Wish logic
+            let hour = now.getHours();
+            let wish = hour < 12 ? "GOOD MORNING" : hour < 17 ? "GOOD AFTERNOON" : "GOOD EVENING";
+            document.getElementById('wish').textContent = wish;
         }
 
-        function changeColor(color) {
-            document.documentElement.style.setProperty('--neon', color);
-            localStorage.setItem('clockColor', color);
+        function setMode(mode) {
+            is24Hour = (mode === 24);
+            document.getElementById('mode-12').classList.toggle('active', !is24Hour);
+            document.getElementById('mode-24').classList.toggle('active', is24Hour);
         }
 
-        function toggleSound(type) {
-            const audio = document.getElementById(type + '-audio');
-            const btn = document.getElementById(type + '-btn');
-            if (audio.paused) { audio.play(); btn.classList.add('active'); }
-            else { audio.pause(); btn.classList.remove('active'); }
+        function setName() {
+            let n = prompt("Enter Name:");
+            if(n) document.getElementById('user-name').textContent = n.toUpperCase();
+        }
+
+        function toggleSound(id) {
+            let a = document.getElementById(id + '-audio');
+            a.paused ? a.play() : a.pause();
         }
 
         function toggleFS() {
@@ -215,20 +139,9 @@
             else document.exitFullscreen();
         }
 
-        const savedColor = localStorage.getItem('clockColor');
-        if (savedColor) changeColor(savedColor);
-
-        const savedName = localStorage.getItem('clockUser');
-        if (savedName) document.getElementById('user-name').textContent = savedName.toUpperCase();
-
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
         setInterval(updateClock, 1000);
-        setInterval(rotateQuotes, 10000); // Change quote every 10 seconds
         updateClock();
-        rotateQuotes();
-
-        if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
     </script>
 </body>
 </html>
