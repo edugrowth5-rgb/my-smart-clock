@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper-Clock AI | Offline Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3815/3815454.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3815/3815454.png">
+    <meta name="theme-color" content="#00ffcc">
+    <style>
+        :root { --bg: #050505; --neon: #00ffcc; --accent: #cc66ff; }
+        body {
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        #greeting { font-size: 20px; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.8; }
+        #user-name { color: var(--neon); font-weight: bold; cursor: pointer; text-decoration: underline; }
+        
+        #quote-box { height: 30px; margin-bottom: 20px; font-size: 13px; color: #888; font-style: italic; transition: 0.5s; }
+
+        .clock-container {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 40px 60px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        #time {
+            font-size: 90px;
+            font-weight: 900;
+            color: var(--neon);
+            text-shadow: 0 0 25px var(--neon);
+            margin: 0;
+            font-family: 'monospace';
+        }
+
+        #ampm { font-size: 30px; margin-left: 10px; opacity: 0.7; }
+        #date { font-size: 18px; opacity: 0.5; margin-top: 10px; letter-spacing: 2px; }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .row { display: flex; gap: 10px; justify-content: center; }
+        .btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+        .btn.active { background: var(--neon); color: black; font-weight: bold; box-shadow: 0 0 15px var(--neon); }
+        
+        @media (max-width: 600px) {
+            #time { font-size: 50px; }
+            .clock-container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="greeting"><span id="wish">HELLO</span>, <span id="user-name" onclick="setName()">USER</span></div>
+    <div id="quote-box">"Make every second count."</div>
+
+    <div class="clock-container">
+        <h1 id="time">00:00:00<span id="ampm"></span></h1>
+        <div id="date">LOADING...</div>
+    </div>
+
+    <div class="controls">
+        <div class="row">
+            <button id="mode-12" class="btn active" onclick="setMode(12)">Indian (12H)</button>
+            <button id="mode-24" class="btn" onclick="setMode(24)">International (24H)</button>
+        </div>
+        <div class="row">
+            <button id="rain-btn" class="btn" onclick="toggleSound('rain')">🌧 Rain Sound</button>
+            <button class="btn" onclick="toggleFS()">⛶ Fullscreen</button>
+        </div>
+    </div>
+
+    <audio id="rain-audio" loop src="https://www.soundjay.com/nature/rain-01.mp3"></audio>
+
+    <script>
+        let is24Hour = false;
+        const quotes = [
+            "Believe you can and you're halfway there.",
+            "Time is a created thing.",
+            "Keep going. Be all in.",
+            "Focus on being productive instead of busy.",
+            "The best time for new beginnings is now."
+        ];
+
+        function updateClock() {
+            const now = new Date();
+            let h = now.getHours();
+            let m = String(now.getMinutes()).padStart(2, '0');
+            let s = String(now.getSeconds()).padStart(2, '0');
+            let ampmDisplay = "";
+
+            if (!is24Hour) {
+                ampmDisplay = h >= 12 ? "PM" : "AM";
+                h = h % 12 || 12;
+            }
+            
+            document.getElementById('time').innerHTML = `${String(h).padStart(2, '0')}:${m}:${s}<span id="ampm">${ampmDisplay}</span>`;
+            
+            const options = { weekday: 'long', day: '2-digit', month: 'short' };
+            document.getElementById('date').textContent = now.toLocaleDateString('en-IN', options).toUpperCase();
+
+            let hr = now.getHours();
+            document.getElementById('wish').textContent = hr < 12 ? "GOOD MORNING" : hr < 17 ? "GOOD AFTERNOON" : "GOOD EVENING";
+        }
+
+        function setMode(mode) {
+            is24Hour = (mode === 24);
+            document.getElementById('mode-12').classList.toggle('active', !is24Hour);
+            document.getElementById('mode-24').classList.toggle('active', is24Hour);
+            updateClock();
+        }
+
+        function setName() {
+            let n = prompt("Enter Your Name:");
+            if(n) {
+                document.getElementById('user-name').textContent = n.toUpperCase();
+                localStorage.setItem('clockUser', n);
+            }
+        }
+
+        function toggleSound(id) {
+            let a = document.getElementById(id + '-audio');
+            let b = document.getElementById(id + '-btn');
+            if(a.paused) { a.play(); b.classList.add('active'); }
+            else { a.pause(); b.classList.remove('active'); }
+        }
+
+        function toggleFS() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        function rotateQuotes() {
+            const qBox = document.getElementById('quote-box');
+            qBox.style.opacity = 0;
+            setTimeout(() => {
+                qBox.textContent = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+                qBox.style.opacity = 1;
+            }, 500);
+        }
+
+        // Init
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+        const savedName = localStorage.getItem('clockUser');
+        if(savedName) document.getElementById('user-name').textContent = savedName.toUpperCase();
+        
+        setInterval(updateClock, 1000);
+        setInterval(rotateQuotes, 15000);
+        updateClock();
+    </script>
+</body>
+</html>
