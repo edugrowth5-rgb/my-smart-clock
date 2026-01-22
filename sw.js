@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hyper-clock-v1';
+const CACHE_NAME = 'hyper-clock-v2';
 const assets = [
   './',
   './index.html',
