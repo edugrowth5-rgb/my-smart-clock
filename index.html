@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper-Clock | AI Personal Assistant</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --neon: #00ffcc;
+        }
+
+        body {
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+
+        /* Greeting Section */
+        #greeting {
+            font-size: 22px;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        #user-name {
+            font-weight: bold;
+            color: var(--neon);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Motivation Quote Section */
+        #quote-box {
+            height: 40px;
+            margin-bottom: 20px;
+            font-style: italic;
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            max-width: 80%;
+            transition: opacity 0.5s;
+        }
+
+        /* Clock Card */
+        .clock-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 40px 60px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+
+        #time {
+            font-size: 100px;
+            font-weight: 900;
+            color: var(--neon);
+            text-shadow: 0 0 25px var(--neon);
+            margin: 0;
+            letter-spacing: 5px;
+            font-family: 'monospace';
+        }
+
+        #date {
+            font-size: 20px;
+            opacity: 0.5;
+            margin-top: 10px;
+            letter-spacing: 3px;
+        }
+
+        /* Controls Panel */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .row { display: flex; gap: 12px; align-items: center; }
+        .dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 1px solid #fff; }
+        .btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .btn.active { background: var(--neon); color: #000; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            #time { font-size: 50px; }
+            #greeting { font-size: 16px; }
+            .clock-container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="greeting">
+        <span id="wish">HELLO</span>, <span id="user-name" onclick="changeName()">USER</span>
+    </div>
+
+    <div id="quote-box">"Believe you can and you're halfway there."</div>
+
+    <div class="clock-container">
+        <h1 id="time">00:00:00</h1>
+        <div id="date">LOADING...</div>
+    </div>
+
+    <div class="controls">
+        <div class="row">
+            <div class="dot" style="background: #00ffcc;" onclick="changeColor('#00ffcc')"></div>
+            <div class="dot" style="background: #ff3366;" onclick="changeColor('#ff3366')"></div>
+            <div class="dot" style="background: #ffcc00;" onclick="changeColor('#ffcc00')"></div>
+            <div class="dot" style="background: #cc66ff;" onclick="changeColor('#cc66ff')"></div>
+            <button class="btn" onclick="toggleFS()">⛶ FULLSCREEN</button>
+        </div>
+        <div class="row">
+            <button id="tick-btn" class="btn" onclick="toggleSound('tick')">⏱ TICK</button>
+            <button id="rain-btn" class="btn" onclick="toggleSound('rain')">🌧 RAIN</button>
+        </div>
+    </div>
+
+    <audio id="tick-audio" loop src="https://www.soundjay.com/buttons/beep-29.mp3"></audio>
+    <audio id="rain-audio" loop src="https://www.soundjay.com/nature/rain-01.mp3"></audio>
+
+    <script>
+        const quotes = [
+            "Keep going. Everything you need will come to you at the perfect time.",
+            "Don't stop until you're proud.",
+            "Your limitation—it's only your imagination.",
+            "Push yourself, because no one else is going to do it for you.",
+            "Great things never come from comfort zones.",
+            "Dream it. Wish it. Do it.",
+            "Success doesn't just find you. You have to go out and get it.",
+            "The harder you work for something, the greater you'll feel when you achieve it."
+        ];
+
+        function updateClock() {
+            const timeElement = document.getElementById('time');
+            const dateElement = document.getElementById('date');
+            const wishElement = document.getElementById('wish');
+            const now = new Date();
+
+            let h = now.getHours();
+            let m = String(now.getMinutes()).padStart(2, '0');
+            let s = String(now.getSeconds()).padStart(2, '0');
+            timeElement.textContent = `${String(h).padStart(2, '0')}:${m}:${s}`;
+
+            const options = { weekday: 'long', day: '2-digit', month: 'short' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options);
+
+            if (h < 12) wishElement.textContent = "GOOD MORNING";
+            else if (h < 17) wishElement.textContent = "GOOD AFTERNOON";
+            else if (h < 21) wishElement.textContent = "GOOD EVENING";
+            else wishElement.textContent = "GOOD NIGHT";
+        }
+
+        function rotateQuotes() {
+            const quoteBox = document.getElementById('quote-box');
+            quoteBox.style.opacity = 0;
+            setTimeout(() => {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                quoteBox.textContent = `"${randomQuote}"`;
+                quoteBox.style.opacity = 1;
+            }, 500);
+        }
+
+        function changeName() {
+            let newName = prompt("What is your name?");
+            if (newName) {
+                document.getElementById('user-name').textContent = newName.toUpperCase();
+                localStorage.setItem('clockUser', newName);
+            }
+        }
+
+        function changeColor(color) {
+            document.documentElement.style.setProperty('--neon', color);
+            localStorage.setItem('clockColor', color);
+        }
+
+        function toggleSound(type) {
+            const audio = document.getElementById(type + '-audio');
+            const btn = document.getElementById(type + '-btn');
+            if (audio.paused) { audio.play(); btn.classList.add('active'); }
+            else { audio.pause(); btn.classList.remove('active'); }
+        }
+
+        function toggleFS() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        const savedColor = localStorage.getItem('clockColor');
+        if (savedColor) changeColor(savedColor);
+
+        const savedName = localStorage.getItem('clockUser');
+        if (savedName) document.getElementById('user-name').textContent = savedName.toUpperCase();
+
+        setInterval(updateClock, 1000);
+        setInterval(rotateQuotes, 10000); // Change quote every 10 seconds
+        updateClock();
+        rotateQuotes();
+    </script>
+</body>
+</html>
